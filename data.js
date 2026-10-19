@@ -13,7 +13,8 @@ window.NH_DATA = {
   "鄂尔多斯",
   "甘宁青",
   "湖北",
-  "山东"
+  "山东",
+  "国外"
  ],
  "privacyMode": "full",
  "managers": [
@@ -745,7 +746,53 @@ window.NH_DATA = {
    "phoneStatus": "verified",
    "phoneRaw": "",
    "regionText": "全球、云南、贵州、两广、江西、西藏、福建",
-   "regions": [],
+   "regions": [
+    {
+     "type": "province",
+     "name": "贵州",
+     "label": "贵州"
+    },
+    {
+     "type": "province",
+     "name": "江西",
+     "label": "江西"
+    },
+    {
+     "type": "province",
+     "name": "福建",
+     "label": "福建"
+    },
+    {
+     "type": "province",
+     "name": "广东",
+     "label": "广东"
+    },
+    {
+     "type": "province",
+     "name": "广西",
+     "label": "广西"
+    },
+    {
+     "type": "province",
+     "name": "云南",
+     "label": "云南"
+    },
+    {
+     "type": "province",
+     "name": "西藏",
+     "label": "西藏"
+    },
+    {
+     "type": "abroad",
+     "name": "全球",
+     "label": "全球"
+    },
+    {
+     "type": "abroad",
+     "name": "海外",
+     "label": "海外"
+    }
+   ],
    "note": "",
    "masked": false,
    "matchReasons": []
@@ -758,7 +805,23 @@ window.NH_DATA = {
    "phoneStatus": "verified",
    "phoneRaw": "",
    "regionText": "国外",
-   "regions": [],
+   "regions": [
+    {
+     "type": "abroad",
+     "name": "国外",
+     "label": "国外"
+    },
+    {
+     "type": "abroad",
+     "name": "海外",
+     "label": "海外"
+    },
+    {
+     "type": "abroad",
+     "name": "国际",
+     "label": "国际"
+    }
+   ],
    "note": "",
    "masked": false,
    "matchReasons": []
@@ -771,7 +834,58 @@ window.NH_DATA = {
    "phoneStatus": "verified",
    "phoneRaw": "",
    "regionText": "国际贸易 非洲，澳洲，中亚，南美洲等",
-   "regions": [],
+   "regions": [
+    {
+     "type": "abroad",
+     "name": "国外",
+     "label": "国外"
+    },
+    {
+     "type": "abroad",
+     "name": "海外",
+     "label": "海外"
+    },
+    {
+     "type": "abroad",
+     "name": "国际",
+     "label": "国际"
+    },
+    {
+     "type": "abroad",
+     "name": "国际贸易",
+     "label": "国际贸易"
+    },
+    {
+     "type": "abroad",
+     "name": "非洲",
+     "label": "非洲"
+    },
+    {
+     "type": "abroad",
+     "name": "澳洲",
+     "label": "澳洲"
+    },
+    {
+     "type": "abroad",
+     "name": "澳大利亚",
+     "label": "澳大利亚"
+    },
+    {
+     "type": "abroad",
+     "name": "中亚",
+     "label": "中亚"
+    },
+    {
+     "type": "abroad",
+     "name": "南美洲",
+     "label": "南美洲"
+    },
+    {
+     "type": "abroad",
+     "name": "南美",
+     "label": "南美"
+    }
+   ],
    "note": "",
    "masked": false,
    "matchReasons": []

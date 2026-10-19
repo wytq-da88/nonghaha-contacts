@@ -66,20 +66,16 @@
         names = [r.name];
         const p = CITY_PROVINCE[r.name];
         if (p) names.push(p);
-      } else if (r.type === 'group') {
-        names = (GROUP_EXPAND[r.name] || [r.name]);
-        names.forEach((n) => {
-          (PROVINCE_CITIES[n] || []).forEach((c) => names.push(c));
-          if (CITY_PROVINCE[n]) names.push(CITY_PROVINCE[n]);
+      } else if (r.type === 'group' || r.type === 'area') {
+        const expand = (r.type === 'group' ? GROUP_EXPAND : AREA_EXPAND)[r.name] || [r.name];
+        const out = [];
+        expand.forEach((n) => {
+          out.push(n);
+          (PROVINCE_CITIES[n] || []).forEach((c) => out.push(c));
+          if (CITY_PROVINCE[n]) out.push(CITY_PROVINCE[n]);
         });
-        names.push(r.name); // 片区关键词本身（如「甘宁青」）
-      } else if (r.type === 'area') {
-        names = (AREA_EXPAND[r.name] || [r.name]);
-        names.forEach((n) => {
-          (PROVINCE_CITIES[n] || []).forEach((c) => names.push(c));
-          if (CITY_PROVINCE[n]) names.push(CITY_PROVINCE[n]);
-        });
-        names.push(r.name); // 片区关键词本身（如「蒙西」）
+        out.push(r.name); // 片区关键词本身（如「甘宁青」「蒙西」）
+        names = out;
       } else {
         names = [r.name];
       }
@@ -109,7 +105,7 @@
         if (rm.excluded.indexOf(Q) !== -1) return;
         const direct = rm.names.some((n) => norm(n) === Q);
         if (!direct) return;
-        if (rm.type === 'province' || rm.type === 'area' || rm.type === 'group') {
+        if (rm.type === 'province' || rm.type === 'area' || rm.type === 'group' || rm.type === 'abroad') {
           reasons.push('直接负责「' + rm.label + '」');
         } else {
           reasons.push('负责 ' + (rm.names.find((n) => norm(n) === Q) || Q));
