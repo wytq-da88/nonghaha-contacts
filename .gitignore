@@ -1,0 +1,4 @@
+app.css.bak
+*.log
+.DS_Store
+node_modules/

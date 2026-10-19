@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="index, follow">
+<meta name="theme-color" content="#1b2724">
+<meta name="format-detection" content="telephone=no">
+<title>农哈哈播种部 · 全国销售服务通讯录</title>
+<link rel="stylesheet" href="./app.css">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23c23327'/%3E%3Ctext x='16' y='23' font-size='18' font-family='sans-serif' font-weight='700' fill='%23fff' text-anchor='middle'%3E农%3C/text%3E%3C/svg%3E">
+</head>
+<body>
+
+<header class="hero">
+  <div class="hero-inner">
+    <div class="brand-row">
+      <div class="brand-mark">农</div>
+      <div>
+        <div class="brand-name">农哈哈 · 播种部</div>
+      </div>
+    </div>
+    <h1>想买播种机，<span class="nowrap"><em>一个电话</em>找到人</span></h1>
+    <p class="hero-sub">不用记销售经理是谁。输入您所在的市或县，直接找到负责这一片的区域经理——买机、配件、售后都找他。</p>
+    <div class="hero-meta">
+      <span class="meta-pill" id="metaTotal">全国区域经理</span>
+      <span class="meta-pill">播种机 · 免耕播种 · 精量播种</span>
+      <span class="meta-pill" id="metaUpdated">数据加载中</span>
+    </div>
+  </div>
+</header>
+
+<div class="search-wrap">
+  <div class="search-box">
+    <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+      <circle cx="11" cy="11" r="7"></circle><path d="M20 20l-3.5-3.5"></path>
+    </svg>
+    <label class="sr-only" for="q">输入地区</label>
+    <input id="q" type="search" inputmode="search" autocomplete="off" enterkeyhint="search"
+           placeholder="输入城市或地区，如：石家庄 / 潍坊 / 周口">
+    <button class="btn-search" id="btnSearch" type="button">查找</button>
+  </div>
+</div>
+
+<div class="chips" id="chips">
+  <span class="chips-label">常查</span>
+</div>
+
+<main>
+  <section id="resultSection" hidden>
+    <div class="section-head">
+      <div class="section-title"><b id="resultTitle">查询结果</b></div>
+      <div class="view-toggle" id="viewToggle">
+        <button type="button" data-view="cards" class="on">卡片</button>
+        <button type="button" data-view="table">表格</button>
+      </div>
+    </div>
+    <div id="result"></div>
+    <div id="related"></div>
+  </section>
+
+  <section id="favSection" hidden>
+    <div class="section-head">
+      <div class="section-title"><b>我收藏的负责人</b></div>
+      <button class="chip" type="button" id="clearFav">清空收藏</button>
+    </div>
+    <div id="favList" class="cards"></div>
+  </section>
+
+  <section id="introSection">
+    <div class="section-head">
+      <div class="section-title"><b>怎么用</b></div>
+    </div>
+    <div class="cards">
+      <div class="card">
+        <h3 style="margin:0 0 6px;font-size:15px">1 · 输入地区</h3>
+        <p style="margin:0;font-size:13px;line-height:1.75;color:var(--muted)">打「石家庄」「潍坊」「周口」都行，市、县、旗、片区（如“蒙西”“甘宁青”）都认。带“市/县”后缀也没关系。</p>
+      </div>
+      <div class="card">
+        <h3 style="margin:0 0 6px;font-size:15px">2 · 确认负责人</h3>
+        <p style="margin:0;font-size:13px;line-height:1.75;color:var(--muted)">系统会说明为什么匹配到他。遇到“某地除某地”（比如安徽除亳州、周口除太康）的情况，被划出去的那块会有单独提示，不会找错人。</p>
+      </div>
+      <div class="card">
+        <h3 style="margin:0 0 6px;font-size:15px">3 · 一键拨号</h3>
+        <p style="margin:0;font-size:13px;line-height:1.75;color:var(--muted)">手机上点「拨打电话」直接跳到拨号界面；电脑上点「复制号码」再发给同事。买机、要配件、报修都走这个人。</p>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="foot-inner">
+    <div>农哈哈播种部 · 本页仅供客户联系使用。号码以公司最新通知为准。</div>
+  </div>
+</footer>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script src="./data.js"></script>
+<script src="./app.js"></script>
+</body>
+</html>
