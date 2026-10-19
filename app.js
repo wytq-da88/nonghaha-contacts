@@ -101,10 +101,12 @@
       if (cov.excludes.has(Q)) return;            // 该经理明确把此地划出
       if (!cov.leaves.has(Q)) return;             // 不在覆盖范围内
       const reasons = [];
+      let anyAbroad = false;
       cov.meta.forEach((rm) => {
         if (rm.excluded.indexOf(Q) !== -1) return;
         const direct = rm.names.some((n) => norm(n) === Q);
         if (!direct) return;
+        if (rm.type === 'abroad') anyAbroad = true;
         if (rm.type === 'province' || rm.type === 'area' || rm.type === 'group' || rm.type === 'abroad') {
           reasons.push('直接负责「' + rm.label + '」');
         } else {
@@ -117,8 +119,17 @@
         if (rm.type === 'province') matchedProvinces.add(rm.name);
         rm.names.forEach((n) => { if (CITY_PROVINCE[norm(n)]) matchedProvinces.add(CITY_PROVINCE[norm(n)]); });
       });
-      matches.push(Object.assign({}, m, { matchReasons: reasons }));
+      matches.push(Object.assign({}, m, { matchReasons: reasons, _abroad: anyAbroad }));
     });
+
+    // 海外/全球类查询（所有命中均来自 abroad 区域）：让国际贸易专员排前
+    if (matches.length && matches.every((m) => m._abroad)) {
+      const overseasScore = (m) =>
+        ((m.regionText || '').includes('国际贸易') ? 100 : 0) +
+        (m.regions || []).filter((r) => r.type === 'abroad').length;
+      matches.sort((a, b) => overseasScore(b) - overseasScore(a));
+    }
+    matches.forEach((m) => { delete m._abroad; });
 
     if (!matches.length) {
       return { ok: false, query: rawQ, error: '该区域暂未收录，或请换个写法（如地级市名）' };

@@ -88,10 +88,12 @@ function localLookup(rawQ) {
     if (cov.excludes.has(Q)) return;
     if (!cov.leaves.has(Q)) return;
     const reasons = [];
+    let anyAbroad = false;
     cov.meta.forEach((rm) => {
       if (rm.excluded.indexOf(Q) !== -1) return;
       const direct = rm.names.some((n) => norm(n) === Q);
       if (!direct) return;
+      if (rm.type === 'abroad') anyAbroad = true;
       if (rm.type === 'province' || rm.type === 'area' || rm.type === 'group' || rm.type === 'abroad') {
         reasons.push('直接负责「' + rm.label + '」');
       } else {
@@ -99,8 +101,15 @@ function localLookup(rawQ) {
       }
     });
     if (!reasons.length) reasons.push('负责 ' + Q);
-    matches.push({ id: m.id, name: m.name, phone: m.phone, reasons: reasons });
+    matches.push({ id: m.id, name: m.name, phone: m.phone, reasons: reasons, regionText: m.regionText, regions: m.regions, _abroad: anyAbroad });
   });
+  if (matches.length && matches.every((m) => m._abroad)) {
+    const overseasScore = (m) =>
+      ((m.regionText || '').includes('国际贸易') ? 100 : 0) +
+      (m.regions || []).filter((r) => r.type === 'abroad').length;
+    matches.sort((a, b) => overseasScore(b) - overseasScore(a));
+  }
+  matches.forEach((m) => { delete m._abroad; });
   return matches.length ? { ok: true, matches: matches } : { ok: false, error: '未收录' };
 }
 
@@ -118,4 +127,30 @@ tests.forEach((q) => {
   }
 });
 console.log(fail ? `\n有 ${fail} 个关键词未命中` : '\n全部命中 ✅');
-process.exit(fail ? 1 : 0);
+
+// ============ 排序断言 ============
+console.log('\n== 排序断言 ==');
+let orderFail = 0;
+function firstOf(q) { const r = localLookup(q); return r.ok ? r.matches[0].name : '(无)'; }
+const orderChecks = [
+  ['国外', '曹蒙'],
+  ['国际', '曹蒙'],
+  ['海外', '曹蒙'],
+  ['非洲', '曹蒙'],
+  ['全球', '王志勇'],
+  ['云南', '宋宝军'],   // 国内顺序保持不变
+  ['贵州', '王志勇'],
+];
+orderChecks.forEach(([q, expect]) => {
+  const got = firstOf(q);
+  if (got === expect) {
+    console.log(`✓ ${q.padEnd(4)} → 第一：${got}`);
+  } else {
+    console.log(`✗ ${q.padEnd(4)} → 第一：${got}（期望 ${expect}）`);
+    orderFail++;
+  }
+});
+
+const total = fail + orderFail;
+console.log(total ? `\n存在 ${total} 个问题` : '\n命中与排序全部通过 ✅');
+process.exit(total ? 1 : 0);
