@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>农哈哈通讯录 · 内容管理后台</title>
+<script src="data.js"></script>
+<style>
+  :root{ --green:#1f8a3b; --green-d:#15692b; --bg:#f4f6f5; --card:#fff; --line:#e3e7e5; --text:#1c2b22; --muted:#6b7a72; --red:#c0392b; }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--text);}
+  header{background:var(--green);color:#fff;padding:14px 18px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;position:sticky;top:0;z-index:20;box-shadow:0 2px 10px rgba(0,0,0,.12)}
+  header h1{font-size:17px;margin:0;font-weight:700}
+  header .sub{font-size:12px;opacity:.85}
+  .tools{margin-left:auto;display:flex;gap:8px;flex-wrap:wrap}
+  button{font-family:inherit;cursor:pointer;border:none;border-radius:9px;padding:8px 13px;font-size:13px;font-weight:600;background:#fff;color:var(--green-d);transition:.15s}
+  button:hover{filter:brightness(.96)}
+  button.primary{background:#fff;color:var(--green-d)}
+  button.danger{background:var(--red);color:#fff}
+  button.ghost{background:rgba(255,255,255,.18);color:#fff}
+  main{max-width:980px;margin:0 auto;padding:16px}
+  .hint{background:#eaf5ee;border:1px solid #cdebd6;color:#1c5a32;font-size:13px;line-height:1.6;padding:12px 14px;border-radius:10px;margin-bottom:16px}
+  .hint b{color:#15692b}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:14px;box-shadow:0 1px 4px rgba(0,0,0,.04)}
+  .card .top{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+  .card .idx{background:var(--green);color:#fff;width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex:none}
+  .card .top input.name{flex:1;font-size:15px;font-weight:700}
+  .row{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:8px}
+  .field{flex:1;min-width:200px}
+  .field label{display:block;font-size:12px;color:var(--muted);margin-bottom:4px}
+  input,textarea{width:100%;border:1px solid var(--line);border-radius:8px;padding:8px 10px;font-size:14px;font-family:inherit;background:#fcfdfc;color:var(--text)}
+  textarea{resize:vertical;min-height:74px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12.5px;line-height:1.5}
+  .rules-help{font-size:11.5px;color:var(--muted);margin-top:4px;line-height:1.5}
+  .rules-help code{background:#eef2f0;padding:1px 5px;border-radius:4px;color:#15692b}
+  .del{margin-left:auto}
+  .add{width:100%;background:var(--green-d);color:#fff;padding:12px;font-size:14px;margin-bottom:20px}
+  footer{text-align:center;color:var(--muted);font-size:12px;padding:24px}
+  .toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%);background:#1c2b22;color:#fff;padding:11px 18px;border-radius:10px;font-size:14px;opacity:0;pointer-events:none;transition:.25s;z-index:50}
+  .toast.show{opacity:1}
+  .preview{font-size:12px;color:var(--muted);margin-top:6px}
+</style>
+</head>
+<body>
+<header>
+  <h1>农哈哈通讯录 · 后台</h1>
+  <span class="sub">可视化编辑片区 / 经理 / 电话，导出即更新线上</span>
+  <div class="tools">
+    <button class="ghost" onclick="addManager()">＋ 新增经理</button>
+    <button class="ghost" onclick="saveDraft()">💾 存草稿</button>
+    <button class="ghost" onclick="loadDraft()">📂 取草稿</button>
+    <button class="primary" onclick="exportDataJs()">⬇ 导出 data.js</button>
+    <button class="ghost" onclick="exportJson()">⬇ 导出备份</button>
+    <button class="ghost" onclick="copyDataJs()">📋 复制文本</button>
+    <button class="ghost" onclick="importFile()">📥 导入</button>
+    <input type="file" id="fileInput" accept=".js,.json" style="display:none" onchange="doImport(event)" />
+  </div>
+</header>
+
+<main>
+  <div class="hint">
+    <b>怎么用：</b> 在下面增删改经理的「姓名 / 电话 / 区域描述 / 片区规则」，改完点 <b>⬇ 导出 data.js</b>（或 <b>📋 复制文本</b>），把文件或文本发给我，我帮你推到线上，几分钟全网生效。<br>
+    <b>片区规则</b>每行一条，格式：<code>类型 名称</code>。类型填 <code>省</code> / <code>市</code> / <code>县</code> / <code>片区</code> / <code>分组</code>；带排除用 <code>排除:亳州,太康</code>。<br>
+    例：<code>省 安徽 排除:亳州</code> 、 <code>市 周口 排除:太康</code> 、 <code>片区 蒙西</code> 、 <code>分组 甘宁青</code> 、 <code>县 鄂托克前旗</code>。
+  </div>
+
+  <div id="list"></div>
+  <button class="add" onclick="addManager()">＋ 新增一位区域经理</button>
+  <footer>纯本地后台 · 数据不离开你的电脑，只有你点「导出」后才会更新线上。</footer>
+</main>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const TYPE_MAP = { '省':'province','省份':'province','省区':'province',
+  '市':'city','城市':'city','市区':'city',
+  '县':'county','区县':'county','区':'county','旗':'county','县区':'county',
+  '片区':'area','区域':'area','地区':'area','蒙西':'area','甘宁青':'group',
+  '分组':'group','组':'group' };
+const GROUP_EXPAND = { '甘宁青':['甘肃','宁夏','青海'] };
+const AREA_EXPAND  = { '蒙西':['阿拉善盟','乌海','巴彦淖尔','鄂尔多斯'] };
+
+let managers = (window.NH_DATA && window.NH_DATA.managers) ? JSON.parse(JSON.stringify(window.NH_DATA.managers)) : [];
+let brand = (window.NH_DATA && window.NH_DATA.brand) || '农哈哈';
+let updatedAt = (window.NH_DATA && window.NH_DATA.updatedAt) || new Date().toISOString().slice(0,10);
+let hotRegions = (window.NH_DATA && window.NH_DATA.hotRegions) || [];
+let privacyMode = (window.NH_DATA && window.NH_DATA.privacyMode) || false;
+
+function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function toast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); clearTimeout(t._t); t._t=setTimeout(()=>t.classList.remove('show'),1800); }
+
+function maskPhone(p){ if(!p||p.length<7) return p||''; return p.slice(0,3)+'****'+p.slice(-4); }
+
+// 解析片区规则文本 -> regions 数组
+function parseRules(text){
+  const lines = String(text||'').split(/\n+/).map(s=>s.trim()).filter(Boolean);
+  const regions=[];
+  for(const line of lines){
+    // 提取排除
+    let excl = [];
+    let body = line;
+    const m = body.match(/排除[:：]\s*([^，,；;]+)/);
+    if(m){ excl = m[1].split(/[，,、；;]/).map(s=>s.trim()).filter(Boolean); body = body.replace(m[0],' '); }
+    const parts = body.trim().split(/\s+/);
+    if(parts.length<2) continue;
+    let typeRaw = parts[0]; let name = parts.slice(1).join(' ').trim();
+    if(!name) continue;
+    let type = TYPE_MAP[typeRaw] || (TYPE_MAP[typeRaw.replace(/[，,。]/g,'')] ) || null;
+    if(!type){ toast('未知类型: '+typeRaw+'（用 省/市/县/片区/分组）'); continue; }
+    let label = name;
+    if(excl.length) label = name + '（除' + excl.join('、') + '）';
+    regions.push({ type, name, label });
+  }
+  return regions;
+}
+
+function regionsToText(regions){
+  if(!regions||!regions.length) return '';
+  return regions.map(r=>{
+    let t = Object.keys(TYPE_MAP).find(k=>TYPE_MAP[k]===r.type && k.length<=3) || r.type;
+    // 优先短中文
+    const short={province:'省',city:'市',county:'县',area:'片区',group:'分组'};
+    t = short[r.type]||r.type;
+    const ex = (r.label||'').match(/（除(.+)）/);
+    if(ex){ return t+' '+r.name+' 排除:'+ex[1].split('、').join(','); }
+    return t+' '+r.name;
+  }).join('\n');
+}
+
+function render(){
+  const list = document.getElementById('list');
+  list.innerHTML = managers.map((m,i)=>{
+    const rules = regionsToText(m.regions);
+    return `<div class="card" data-i="${i}">
+      <div class="top">
+        <span class="idx">${i+1}</span>
+        <input class="name" value="${esc(m.name)}" data-k="name" placeholder="姓名" />
+        <button class="danger del" onclick="delManager(${i})">删除</button>
+      </div>
+      <div class="row">
+        <div class="field"><label>电话</label><input value="${esc(m.phone)}" data-k="phone" placeholder="如 19933160163" /></div>
+        <div class="field"><label>区域描述（展示用，如「陕西、鄂托克前旗」）</label><input value="${esc(m.regionText)}" data-k="regionText" placeholder="负责：陕西、鄂托克前旗" /></div>
+      </div>
+      <div class="field"><label>片区规则（每行一条，详见顶部说明）</label>
+        <textarea data-k="rules" placeholder="省 陕西&#10;县 鄂托克前旗&#10;省 安徽 排除:亳州">${esc(rules)}</textarea>
+        <div class="rules-help">类型：<code>省</code> <code>市</code> <code>县</code> <code>片区</code> <code>分组</code>；排除示例 <code>省 安徽 排除:亳州,太康</code></div>
+      </div>
+    </div>`;
+  }).join('');
+  // 绑定输入事件
+  list.querySelectorAll('.card').forEach(card=>{
+    const i = +card.dataset.i;
+    card.querySelectorAll('[data-k]').forEach(inp=>{
+      inp.addEventListener('input', ()=>{
+        const k = inp.dataset.k;
+        if(k==='rules'){ managers[i].regions = parseRules(inp.value); }
+        else managers[i][k] = inp.value;
+      });
+    });
+  });
+}
+
+function addManager(){
+  const nextId = managers.reduce((a,m)=>Math.max(a,(m.id||0)),0)+1;
+  managers.push({ id:nextId, name:'', phone:'', phoneMasked:'', phoneStatus:'verified', phoneRaw:'',
+    regionText:'', regions:[], note:'', masked:false, matchReasons:[] });
+  render(); toast('已新增，填完点导出');
+}
+function delManager(i){ managers.splice(i,1); render(); toast('已删除'); }
+
+function buildData(){
+  const out = managers.map(m=>{
+    const phone = (m.phone||'').trim();
+    return {
+      id: m.id,
+      name: (m.name||'').trim(),
+      phone,
+      phoneMasked: maskPhone(phone),
+      phoneStatus: m.phoneStatus || (phone?'verified':'pending'),
+      phoneRaw: m.phoneRaw || '',
+      regionText: (m.regionText||'').trim(),
+      regions: m.regions || [],
+      note: m.note || '',
+      masked: !!m.masked,
+      matchReasons: m.matchReasons || []
+    };
+  }).filter(m=>m.name || m.phone);
+  return { brand, updatedAt:new Date().toISOString().slice(0,10), hotRegions, privacyMode, managers:out };
+}
+
+function dataJsText(){
+  const data = buildData();
+  return 'window.NH_DATA = ' + JSON.stringify(data,null,1) + ';\n';
+}
+function exportDataJs(){
+  const blob = new Blob([dataJsText()],{type:'application/javascript'});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='data.js'; a.click();
+  toast('已导出 data.js，发给我即可更新线上');
+}
+function exportJson(){
+  const blob = new Blob([JSON.stringify(buildData(),null,2)],{type:'application/json'});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='contacts.json'; a.click();
+  toast('已导出 contacts.json 备份');
+}
+function copyDataJs(){
+  navigator.clipboard.writeText(dataJsText()).then(()=>toast('已复制 data.js 文本')).catch(()=>toast('复制失败，请用导出'));
+}
+function saveDraft(){
+  try{ localStorage.setItem('nh_admin_draft', JSON.stringify(managers)); toast('草稿已存到本机浏览器'); }
+  catch(e){ toast('存储失败'); }
+}
+function loadDraft(){
+  const d = localStorage.getItem('nh_admin_draft');
+  if(!d){ toast('没有草稿'); return; }
+  managers = JSON.parse(d); render(); toast('已从草稿恢复');
+}
+function importFile(){ document.getElementById('fileInput').click(); }
+function doImport(e){
+  const f = e.target.files[0]; if(!f) return;
+  const r = new FileReader();
+  r.onload = ()=>{
+    try{
+      let txt = r.result;
+      const mm = txt.match(/NH_DATA\s*=\s*([\s\S]+?);?\s*$/);
+      let obj;
+      if(mm){ obj = JSON.parse(mm[1]); }
+      else { obj = JSON.parse(txt); }
+      if(obj && obj.managers){ managers = obj.managers; brand=obj.brand||brand; hotRegions=obj.hotRegions||[]; privacyMode=obj.privacyMode||false; render(); toast('导入成功：'+managers.length+' 位'); }
+      else toast('文件格式不对');
+    }catch(err){ toast('解析失败：'+err.message); }
+  };
+  r.readAsText(f);
+}
+
+render();
+</script>
+</body>
+</html>

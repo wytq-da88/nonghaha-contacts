@@ -1,6 +1,6 @@
 window.NH_DATA = {
  "brand": "农哈哈播种部 · 全国销售服务通讯录",
- "updatedAt": "2026-10-17T07:00:31.847Z",
+ "updatedAt": "2026-10-19",
  "hotRegions": [
   "石家庄",
   "天津",
@@ -736,6 +736,45 @@ window.NH_DATA = {
    "matchReasons": [
     "直接负责「山西（除吕梁、晋中、太原）」"
    ]
+  },
+  {
+   "id": 22,
+   "name": "王志勇",
+   "phone": "13784326885",
+   "phoneMasked": "137****6885",
+   "phoneStatus": "verified",
+   "phoneRaw": "",
+   "regionText": "全球、云南、贵州、两广、江西、西藏、福建",
+   "regions": [],
+   "note": "",
+   "masked": false,
+   "matchReasons": []
+  },
+  {
+   "id": 23,
+   "name": "曹晓丹",
+   "phone": "13933870601",
+   "phoneMasked": "139****0601",
+   "phoneStatus": "verified",
+   "phoneRaw": "",
+   "regionText": "国外",
+   "regions": [],
+   "note": "",
+   "masked": false,
+   "matchReasons": []
+  },
+  {
+   "id": 24,
+   "name": "曹蒙",
+   "phone": "15613352912",
+   "phoneMasked": "156****2912",
+   "phoneStatus": "verified",
+   "phoneRaw": "",
+   "regionText": "国际贸易 非洲，澳洲，中亚，南美洲等",
+   "regions": [],
+   "note": "",
+   "masked": false,
+   "matchReasons": []
   }
  ]
 };
